@@ -1,1 +1,1 @@
-# content-management-system-panel
+# content-management-system

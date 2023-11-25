@@ -1,7 +1,6 @@
 from django.contrib import admin
-from .models import Article
+from article.models import Article, ArticlePhoto
 
 
-@admin.register(Article)
-class ArticleAdmin(admin.ModelAdmin):
-    pass
+admin.site.register(Article)
+admin.site.register(ArticlePhoto)

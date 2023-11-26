@@ -15,6 +15,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = ['title', 'content', 'created_at', 'author']
 
     # def validate_content(self, content):
-    #     if len(content) > 3 :
-    #         raise serializers.ValidationError('')
+    #     min_character = 10
+    #     if len(content) < min_character :
+    #         raise serializers.ValidationError(f'your content should be greater than {min_character}')
     #     return content

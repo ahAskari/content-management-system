@@ -1,11 +1,11 @@
+from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status, mixins, generics, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.authentication import BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
 from article.serializers import ArticleSerializer
 from article.models import Article
 
@@ -57,14 +57,22 @@ def article_detail_view(request: Request, pk: int):
 
 # region class view
 class ArticlesView(APIView):
-    def get_object(self):
+    serializer_class = ArticleSerializer
+
+    @extend_schema(
+        request=ArticleSerializer,
+        responses={200: ArticleSerializer},
+        description='this api is used to get all article'
+    )
+    def get_object(self, user_id:int):
         try:
-            return Article.objects.all()
+            return Article.objects.filter(author=user_id)
         except:
             return Response(None, status.HTTP_404_NOT_FOUND)
 
     def get(self, request):
-        article = self.get_object()
+        user_id = request.user.id
+        article = self.get_object(user_id)
         serializer = ArticleSerializer(article, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
@@ -77,17 +85,26 @@ class ArticlesView(APIView):
         return Response(None, status.HTTP_400_BAD_REQUEST)
 
 
+# @login_required
 class ArticleDetailsView(APIView):
+    serializer_class = ArticleSerializer
 
-    def get_object(self, pk: int):
+    @extend_schema(
+        request=ArticleSerializer,
+        responses={201: ArticleSerializer},
+        description='this api is used to get all article'
+    )
+
+    def get_object(self, user_id: int):
         try:
-            return Article.objects.get(pk=pk)
+            return Article.objects.filter(author=user_id)
         except Article.DoesNotExist:
             return Response(None, status.HTTP_404_NOT_FOUND)
 
     def get(self, request: Request, pk: int):
-        article = self.get_object(pk)
-        serializer = ArticleSerializer(article)
+        user_id = request.user.id
+        article = self.get_object(user_id)
+        serializer = ArticleSerializer(article, many=True)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def put(self, request: Request, pk: int):
@@ -141,4 +158,5 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     pagination_class = PaginationApiView
+
 # endregion

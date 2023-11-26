@@ -12,4 +12,9 @@ from article.models import Article
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = '__all__'
+        fields = ['title', 'content', 'created_at', 'author']
+
+    # def validate_content(self, content):
+    #     if len(content) > 3 :
+    #         raise serializers.ValidationError('')
+    #     return content

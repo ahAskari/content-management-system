@@ -7,10 +7,10 @@ router = DefaultRouter()
 router.register('', ArticleViewSet, basename='articleViewSet')
 
 urlpatterns = [
+    path('', ArticlesView.as_view()),
+    path('<int:pk>', ArticleDetailsView.as_view()),
     path('', articles_view),
     path('<int:pk>', article_detail_view),
-    path('cbv', ArticlesView.as_view()),
-    path('cbv/<int:pk>', ArticleDetailsView.as_view()),
     path('generic/<int:pk>', ArticleGenericDetailView.as_view()),
     path('viewsets/', include(router.urls)),
     path('auth-token/', obtain_auth_token, name='generate_auth_token')

@@ -12,7 +12,7 @@ from article.models import Article
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = ['title', 'content', 'created_at', 'author']
+        fields = '__all__'
 
     # def validate_content(self, content):
     #     min_character = 10

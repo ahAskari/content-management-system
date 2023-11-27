@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
 from article.serializers import ArticleSerializer
 from article.models import Article
-from rest_framework import generics
 
 
 class ArticlesView(APIView):
@@ -20,7 +19,7 @@ class ArticlesView(APIView):
         user_id = request.user.id
         try:
             return Article.objects.filter(author=user_id)
-        except:
+        except Article.DoesNotExist:
             return Response(None, status.HTTP_404_NOT_FOUND)
 
     def get(self, request: Request):
@@ -29,7 +28,10 @@ class ArticlesView(APIView):
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request: Request):
-        serializer = ArticleSerializer(data=request.data)
+        data = request.data
+        data['author'] = request.user.pk
+        serializer = ArticleSerializer(data=data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status.HTTP_201_CREATED)
@@ -47,18 +49,22 @@ class ArticleDetailsView(APIView):
     )
     def get_object(self, request: Request, pk: int):
         user_id = request.user.id
+
         try:
-            return Article.objects.filter(author=user_id, pk=pk)
+            # return Article.objects.filter(author=user_id, pk=pk).first()
+            return Article.objects.get(author=user_id, pk=pk)
         except Article.DoesNotExist:
             return Response(None, status.HTTP_404_NOT_FOUND)
 
     def get(self, request: Request, pk: int):
         article = self.get_object(request, pk)
-        serializer = ArticleSerializer(article, many=True)
+        serializer = ArticleSerializer(article)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def put(self, request: Request, pk: int):
         article = self.get_object(request, pk)
+        data = request.data
+        data['author'] = request.user.pk
         serializer = ArticleSerializer(article, data=request.data)
 
         if serializer.is_valid():

@@ -7,6 +7,12 @@ from article.serializers import ArticleSerializer
 from article.models import Article
 
 
+def store_file(file):
+    with open('temp/image.jpg', 'wb+') as dest:
+        for chunk in file.chunks():
+            dest.write(chunk)
+
+
 class ArticlesView(APIView):
     serializer_class = ArticleSerializer
 
@@ -25,12 +31,13 @@ class ArticlesView(APIView):
     def get(self, request: Request):
         article = self.get_object(request)
         serializer = ArticleSerializer(article, many=True)
+
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request: Request):
-        data = request.data
-        data['author'] = request.user.pk
-        serializer = ArticleSerializer(data=data)
+        article = request.data
+        article['author'] = request.user.pk
+        serializer = ArticleSerializer(data=article)
 
         if serializer.is_valid():
             serializer.save()
@@ -51,8 +58,7 @@ class ArticleDetailsView(APIView):
         user_id = request.user.id
 
         try:
-            # return Article.objects.filter(author=user_id, pk=pk).first()
-            return Article.objects.get(author=user_id, pk=pk)
+            return Article.objects.filter(author=user_id, pk=pk)
         except Article.DoesNotExist:
             return Response(None, status.HTTP_404_NOT_FOUND)
 

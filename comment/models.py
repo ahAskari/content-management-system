@@ -4,7 +4,7 @@ from django.db import models
 class Comment(models.Model):
     content = models.CharField(max_length=200)
     author = models.ForeignKey('user.User', on_delete=models.CASCADE, related_name='comment')
-    article_id = models.ForeignKey('article.Article', on_delete=models.CASCADE, related_name='comment_of_article')
+    article_id = models.ForeignKey('post.Post', on_delete=models.CASCADE, related_name='comment_of_article')
     created_at = models.DateField(auto_now=True)
 
     class Meta:

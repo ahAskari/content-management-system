@@ -1,6 +1,5 @@
 from django.urls import path
-from article.views import ArticleDetailsView, ArticlesView
-from rest_framework.authtoken.views import obtain_auth_token
+from post.views import ArticleDetailsView, ArticlesView
 
 urlpatterns = [
     path('', ArticlesView.as_view()),

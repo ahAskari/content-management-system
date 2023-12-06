@@ -23,8 +23,11 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('users/', include('user.urls')),
-    path('articles/', include('article.urls')),
+    path('posts/', include('post.urls')),
     path('comments/', include('comment.urls')),
+    path('roles/', include('role.urls')),
+    path('tags/', include('tag.urls')),
+    path('categories/', include('category.urls')),
     path('api-auth/', include('rest_framework.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

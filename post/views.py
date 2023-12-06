@@ -1,10 +1,11 @@
-from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework import status
-from rest_framework.views import APIView
 from drf_spectacular.utils import extend_schema
-from article.serializers import ArticleSerializer
-from article.models import Article
+from rest_framework import status
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from post.models import Post
+from post.serializers import PostSerializer
 
 
 def store_file(file):
@@ -14,30 +15,30 @@ def store_file(file):
 
 
 class ArticlesView(APIView):
-    serializer_class = ArticleSerializer
+    serializer_class = PostSerializer
 
     @extend_schema(
-        request=ArticleSerializer,
-        responses={200: ArticleSerializer},
-        description='this api is used to get all article or post new article'
+        request=PostSerializer,
+        responses={200: PostSerializer},
+        description='this api is used to get all post or post new post'
     )
     def get_object(self, request: Request):
         user_id = request.user.id
         try:
-            return Article.objects.filter(author=user_id)
-        except Article.DoesNotExist:
+            return Post.objects.filter(author=user_id)
+        except Post.DoesNotExist:
             return Response(None, status.HTTP_404_NOT_FOUND)
 
     def get(self, request: Request):
-        article = self.get_object(request)
-        serializer = ArticleSerializer(article, many=True)
+        post = self.get_object(request)
+        serializer = PostSerializer(post, many=True)
 
         return Response(serializer.data, status.HTTP_200_OK)
 
     def post(self, request: Request):
-        article = request.data
-        article['author'] = request.user.pk
-        serializer = ArticleSerializer(data=article)
+        post = request.data
+        post['author'] = request.user.pk
+        serializer = PostSerializer(data=post)
 
         if serializer.is_valid():
             serializer.save()
@@ -47,31 +48,31 @@ class ArticlesView(APIView):
 
 
 class ArticleDetailsView(APIView):
-    serializer_class = ArticleSerializer
+    serializer_class = PostSerializer
 
     @extend_schema(
-        request=ArticleSerializer,
-        responses={201: ArticleSerializer},
-        description='this api is used to get, update or delete article by id'
+        request=PostSerializer,
+        responses={201: PostSerializer},
+        description='this api is used to get, update or delete post by id'
     )
     def get_object(self, request: Request, pk: int):
         user_id = request.user.id
 
         try:
-            return Article.objects.filter(author=user_id, pk=pk)
-        except Article.DoesNotExist:
+            return Post.objects.filter(author=user_id, pk=pk)
+        except Post.DoesNotExist:
             return Response(None, status.HTTP_404_NOT_FOUND)
 
     def get(self, request: Request, pk: int):
-        article = self.get_object(request, pk)
-        serializer = ArticleSerializer(article)
+        post = self.get_object(request, pk)
+        serializer = PostSerializer(post)
         return Response(serializer.data, status.HTTP_200_OK)
 
     def put(self, request: Request, pk: int):
-        article = self.get_object(request, pk)
+        post = self.get_object(request, pk)
         data = request.data
         data['author'] = request.user.pk
-        serializer = ArticleSerializer(article, data=request.data)
+        serializer = PostSerializer(post, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
@@ -80,6 +81,6 @@ class ArticleDetailsView(APIView):
         return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request: Request, pk: int):
-        article = self.get_object(request, pk)
-        article.delete()
+        post = self.get_object(request, pk)
+        post.delete()
         return Response(None, status.HTTP_204_NO_CONTENT)

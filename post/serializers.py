@@ -1,16 +1,16 @@
 from rest_framework import serializers
-from article.models import Article
+
+from post.models import Post
 from comment.serializers import CommentSerializer
 
 
-class ArticleSerializer(serializers.ModelSerializer):
+class PostSerializer(serializers.ModelSerializer):
     author_username = serializers.SerializerMethodField()
     author_avatar = serializers.SerializerMethodField()
-    author_role = serializers.SerializerMethodField()
-    comment_of_article = CommentSerializer(many=True, read_only=True)
+    comment_post = CommentSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Article
+        model = Post
         fields = '__all__'
 
     def get_author_username(self, obj):
@@ -18,9 +18,6 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     def get_author_avatar(self, obj):
         return obj.author.avatar if obj.author else None
-
-    def get_author_role(self, obj):
-        return obj.author.role if obj.author else None
 
     # def validate_content(self, content):
     #     min_character = 10

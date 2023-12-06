@@ -91,7 +91,7 @@ class CommentOfArticle(APIView):
         user_id = request.user.id
 
         try:
-            return Comment.objects.filter(author=user_id, article=pk)
+            return Comment.objects.filter(author=user_id, post=pk)
         except Comment.DoesNotExist:
             raise Http404
 
